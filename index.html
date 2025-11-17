@@ -576,12 +576,20 @@
         // Make Firebase functions available globally
         window.firebaseDB = {
             saveData: async (data) => {
-                await set(foldersRef, data);
+                // Convert array to object with unique keys to preserve structure
+                const dataObject = {};
+                data.forEach((folder, index) => {
+                    dataObject[folder.id] = folder;
+                });
+                await set(foldersRef, dataObject);
             },
             loadData: (callback) => {
                 onValue(foldersRef, (snapshot) => {
                     const data = snapshot.val();
                     callback(data);
+                }, (error) => {
+                    console.error('Firebase read error:', error);
+                    callback(null);
                 });
             }
         };
