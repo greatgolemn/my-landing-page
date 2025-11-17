@@ -252,45 +252,60 @@
         }
 
         .links-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
             animation: fadeInUp 1s ease;
         }
 
         .folder {
             background: rgba(255,255,255,0.95);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
             backdrop-filter: blur(10px);
             animation: slideIn 0.5s ease;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .folder:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.18);
         }
 
         .folder-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e0e0e0;
             cursor: pointer;
+            user-select: none;
+        }
+
+        .folder-header:hover .folder-title {
+            color: #667eea;
         }
 
         .folder-title {
-            font-size: 1.3em;
+            font-size: 1.4em;
             font-weight: 700;
             color: #333;
             display: flex;
             align-items: center;
             gap: 10px;
+            flex: 1;
+            transition: color 0.3s ease;
         }
 
         .folder-icon {
-            font-size: 1.5em;
+            font-size: 1.8em;
         }
 
         .folder-actions {
             display: flex;
-            gap: 10px;
+            gap: 5px;
         }
 
         .icon-btn {
@@ -313,46 +328,69 @@
 
         .folder-content {
             display: none;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            animation: slideDown 0.3s ease;
         }
 
         .folder-content.open {
-            display: block;
+            display: flex;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .link-card {
-            background: #f9f9f9;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
             padding: 15px;
             border-radius: 12px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             transition: all 0.3s ease;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            border-left: 4px solid #667eea;
         }
 
         .link-card:hover {
             transform: translateX(5px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(102,126,234,0.2);
+            border-left-color: #764ba2;
         }
 
         .link-info {
-            flex: 1;
-            margin-right: 15px;
+            margin-bottom: 10px;
         }
 
         .link-title {
             font-weight: 600;
             color: #333;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-size: 1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .link-title::before {
+            content: '🔗';
+            font-size: 0.9em;
         }
 
         .link-url {
             color: #667eea;
             text-decoration: none;
-            font-size: 0.9em;
+            font-size: 0.85em;
             word-break: break-all;
+            display: block;
         }
 
         .link-url:hover {
@@ -366,13 +404,22 @@
             padding: 8px 15px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 0.9em;
+            font-size: 0.85em;
             transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 5px;
         }
 
         .delete-btn:hover {
             background: #ff3838;
-            transform: scale(1.05);
+            transform: scale(1.02);
+        }
+
+        .folder-empty {
+            text-align: center;
+            padding: 30px 20px;
+            color: #999;
+            font-style: italic;
         }
 
         .toggle-btn {
@@ -458,6 +505,10 @@
         }
 
         @media (max-width: 768px) {
+            .container {
+                padding: 0 10px;
+            }
+
             h1 {
                 font-size: 2em;
             }
@@ -468,6 +519,26 @@
 
             .modal-content {
                 padding: 30px 20px;
+            }
+
+            .links-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .folder {
+                padding: 20px;
+            }
+
+            .folder-title {
+                font-size: 1.2em;
+            }
+
+            .toggle-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 55px;
+                height: 55px;
             }
         }
     </style>
@@ -581,13 +652,19 @@
         window.firebaseDB = {
             saveData: async (data) => {
                 console.log('Saving to Firebase:', data);
-                // Convert array to object with unique keys to preserve structure
-                const dataObject = {};
-                data.forEach((folder, index) => {
-                    dataObject[folder.id] = folder;
-                });
-                await set(foldersRef, dataObject);
-                console.log('Data saved to Firebase');
+                // If data is empty, clear the entire node
+                if (data.length === 0) {
+                    await set(foldersRef, null);
+                    console.log('Firebase data cleared');
+                } else {
+                    // Convert array to object with unique keys to preserve structure
+                    const dataObject = {};
+                    data.forEach((folder, index) => {
+                        dataObject[folder.id] = folder;
+                    });
+                    await set(foldersRef, dataObject);
+                    console.log('Data saved to Firebase');
+                }
             },
             loadData: (callback) => {
                 console.log('Setting up Firebase listener...');
@@ -629,9 +706,10 @@
                     if (data) {
                         // Convert Firebase object to array if needed
                         if (typeof data === 'object' && !Array.isArray(data)) {
-                            folders = Object.values(data);
+                            folders = Object.values(data).filter(f => f != null);
                         } else if (Array.isArray(data)) {
-                            folders = data;
+                            // Filter out null/undefined from sparse array
+                            folders = data.filter(f => f != null);
                         } else {
                             folders = [];
                         }
@@ -641,8 +719,8 @@
                         // Ensure links is always an array
                         folders = folders.map(folder => ({
                             ...folder,
-                            links: Array.isArray(folder.links) ? folder.links : 
-                                   (folder.links ? Object.values(folder.links) : [])
+                            links: Array.isArray(folder.links) ? folder.links.filter(l => l != null) : 
+                                   (folder.links ? Object.values(folder.links).filter(l => l != null) : [])
                         }));
                         
                         console.log('Folders after link conversion:', folders);
@@ -683,7 +761,7 @@
                                 <div class="link-title">${link.title}</div>
                                 <a href="${link.url}" target="_blank" class="link-url">${link.url}</a>
                             </div>
-                            ${isAdmin ? `<button class="delete-btn" onclick="deleteLink(${folderIndex}, ${linkIndex})">ลบ</button>` : ''}
+                            ${isAdmin ? `<button class="delete-btn" onclick="deleteLink(${folderIndex}, ${linkIndex})">ลบลิงก์</button>` : ''}
                         </div>
                     `;
                 });
@@ -692,17 +770,20 @@
                     <div class="folder-header" onclick="toggleFolder(${folderIndex})">
                         <div class="folder-title">
                             <span class="folder-icon">${folder.icon}</span>
-                            <span>${folder.name}</span>
-                            <span style="font-size: 0.8em; color: #999;">(${folder.links.length})</span>
+                            <div>
+                                <div>${folder.name}</div>
+                                <div style="font-size: 0.7em; color: #999; font-weight: 400;">${folder.links.length} ลิงก์</div>
+                            </div>
                         </div>
-                        ${isAdmin ? `
-                        <div class="folder-actions" onclick="event.stopPropagation()">
-                            <button class="icon-btn delete-folder-btn" onclick="deleteFolder(${folderIndex})">🗑️</button>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            ${isAdmin ? `
+                            <button class="icon-btn delete-folder-btn" onclick="event.stopPropagation(); deleteFolder(${folderIndex})" title="ลบโฟลเดอร์">🗑️</button>
+                            ` : ''}
+                            <span style="font-size: 1.2em; color: #999;">▼</span>
                         </div>
-                        ` : ''}
                     </div>
-                    <div class="folder-content open" id="folder-${folderIndex}">
-                        ${linksHTML || '<p style="color: #999; text-align: center; padding: 20px;">ยังไม่มีลิงก์ในโฟลเดอร์นี้</p>'}
+                    <div class="folder-content" id="folder-${folderIndex}">
+                        ${linksHTML || '<div class="folder-empty">📭 ยังไม่มีลิงก์</div>'}
                     </div>
                 `;
                 container.appendChild(folderDiv);
