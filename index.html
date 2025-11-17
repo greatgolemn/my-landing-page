@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RTD1 Links Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #a8d8ea 0%, #89c4f4 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.1;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: white;
+            animation: float 20s infinite;
+        }
+
+        .circle:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .circle:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            top: 60%;
+            left: 80%;
+            animation-delay: 4s;
+        }
+
+        .circle:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            top: 80%;
+            left: 20%;
+            animation-delay: 2s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-30px) rotate(180deg);
+            }
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border: 4px solid white;
+            overflow: hidden;
+            background: white;
+        }
+
+        .profile-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1em;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .admin-panel {
+            background: rgba(255,255,255,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: #f5f5f5;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102,126,234,0.4);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .links-container {
+            animation: fadeInUp 1s ease;
+        }
+
+        .folder {
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            animation: slideIn 0.5s ease;
+        }
+
+        .folder-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+            cursor: pointer;
+        }
+
+        .folder-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .folder-icon {
+            font-size: 1.5em;
+        }
+
+        .folder-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .icon-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .delete-folder-btn {
+            color: #ff4757;
+        }
+
+        .folder-content {
+            display: none;
+        }
+
+        .folder-content.open {
+            display: block;
+        }
+
+        .link-card {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .link-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .link-info {
+            flex: 1;
+            margin-right: 15px;
+        }
+
+        .link-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 1em;
+        }
+
+        .link-url {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9em;
+            word-break: break-all;
+        }
+
+        .link-url:hover {
+            text-decoration: underline;
+        }
+
+        .delete-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: #ff3838;
+            transform: scale(1.05);
+        }
+
+        .toggle-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toggle-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        .admin-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #667eea;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-badge:hover {
+            transform: scale(1.05);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            .admin-panel {
+                padding: 20px;
+            }
+
+            .modal-content {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+    </div>
+
+    <div id="adminBadge" class="admin-badge hidden" onclick="logout()">
+        🔐 Admin Mode (คลิกเพื่อออก)
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="profile-img">
+                <img src="logo - กฝภ.1.png" alt="RTD1 Logo">
+            </div>
+            <h1>RTD1 Links Hub</h1>
+            <p class="subtitle">รวมลิงก์ทั้งหมดของ กฝภ.1</p>
+        </div>
+
+        <div id="adminPanel" class="admin-panel hidden">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('folder')">📁 เพิ่ม Folder</button>
+                <button class="tab" onclick="switchTab('link')">🔗 เพิ่มลิงก์</button>
+            </div>
+
+            <div id="folderTab" class="tab-content active">
+                <h2 style="margin-bottom: 20px; color: #333;">สร้าง Folder ใหม่</h2>
+                <div class="input-group">
+                    <label>ชื่อ Folder</label>
+                    <input type="text" id="folderName" placeholder="เช่น Social Media, Work, Portfolio">
+                </div>
+                <div class="input-group">
+                    <label>ไอคอน (เลือกหรือพิมพ์ emoji)</label>
+                    <input type="text" id="folderIcon" placeholder="📱 🎨 💼 📧" maxlength="2">
+                </div>
+                <button class="btn btn-primary" onclick="addFolder()">สร้าง Folder</button>
+            </div>
+
+            <div id="linkTab" class="tab-content">
+                <h2 style="margin-bottom: 20px; color: #333;">เพิ่มลิงก์ใหม่</h2>
+                <div class="input-group">
+                    <label>เลือก Folder</label>
+                    <select id="linkFolder">
+                        <option value="">-- เลือก Folder --</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>ชื่อลิงก์</label>
+                    <input type="text" id="linkTitle" placeholder="เช่น Facebook, Instagram, Portfolio">
+                </div>
+                <div class="input-group">
+                    <label>URL</label>
+                    <input type="url" id="linkUrl" placeholder="https://example.com">
+                </div>
+                <button class="btn btn-primary" onclick="addLink()">เพิ่มลิงก์</button>
+            </div>
+
+            <button class="btn btn-secondary" onclick="toggleAdmin()">ปิด</button>
+        </div>
+
+        <div class="links-container" id="linksContainer"></div>
+    </div>
+
+    <button class="toggle-btn" onclick="handleToggleClick()">+</button>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 20px; color: #333; text-align: center;">🔐 Admin Login</h2>
+            <div class="input-group">
+                <label>รหัสผ่าน</label>
+                <input type="password" id="adminPassword" placeholder="กรอกรหัสผ่าน">
+            </div>
+            <button class="btn btn-primary" onclick="login()">เข้าสู่ระบบ</button>
+            <button class="btn btn-secondary" onclick="closeLoginModal()">ยกเลิก</button>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = 'a1234***';
+        let isAdmin = false;
+        let folders = [];
+
+        function loadData() {
+            const savedFolders = localStorage.getItem('myFolders');
+            if (savedFolders) {
+                folders = JSON.parse(savedFolders);
+            } else {
+                folders = [
+                    { 
+                        id: 1, 
+                        name: 'Social Media', 
+                        icon: '📱',
+                        links: [
+                            { title: 'Facebook', url: 'https://facebook.com' },
+                            { title: 'Instagram', url: 'https://instagram.com' }
+                        ]
+                    },
+                    { 
+                        id: 2, 
+                        name: 'Work', 
+                        icon: '💼',
+                        links: [
+                            { title: 'LinkedIn', url: 'https://linkedin.com' }
+                        ]
+                    }
+                ];
+            }
+            renderFolders();
+            updateFolderSelect();
+        }
+
+        function saveData() {
+            localStorage.setItem('myFolders', JSON.stringify(folders));
+        }
+
+        function renderFolders() {
+            const container = document.getElementById('linksContainer');
+            container.innerHTML = '';
+            
+            folders.forEach((folder, folderIndex) => {
+                const folderDiv = document.createElement('div');
+                folderDiv.className = 'folder';
+                
+                let linksHTML = '';
+                folder.links.forEach((link, linkIndex) => {
+                    linksHTML += `
+                        <div class="link-card">
+                            <div class="link-info">
+                                <div class="link-title">${link.title}</div>
+                                <a href="${link.url}" target="_blank" class="link-url">${link.url}</a>
+                            </div>
+                            ${isAdmin ? `<button class="delete-btn" onclick="deleteLink(${folderIndex}, ${linkIndex})">ลบ</button>` : ''}
+                        </div>
+                    `;
+                });
+                
+                folderDiv.innerHTML = `
+                    <div class="folder-header" onclick="toggleFolder(${folderIndex})">
+                        <div class="folder-title">
+                            <span class="folder-icon">${folder.icon}</span>
+                            <span>${folder.name}</span>
+                            <span style="font-size: 0.8em; color: #999;">(${folder.links.length})</span>
+                        </div>
+                        ${isAdmin ? `
+                        <div class="folder-actions" onclick="event.stopPropagation()">
+                            <button class="icon-btn delete-folder-btn" onclick="deleteFolder(${folderIndex})">🗑️</button>
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div class="folder-content open" id="folder-${folderIndex}">
+                        ${linksHTML || '<p style="color: #999; text-align: center; padding: 20px;">ยังไม่มีลิงก์ในโฟลเดอร์นี้</p>'}
+                    </div>
+                `;
+                container.appendChild(folderDiv);
+            });
+        }
+
+        function toggleFolder(index) {
+            const content = document.getElementById(`folder-${index}`);
+            content.classList.toggle('open');
+        }
+
+        function updateFolderSelect() {
+            const select = document.getElementById('linkFolder');
+            select.innerHTML = '<option value="">-- เลือก Folder --</option>';
+            folders.forEach((folder, index) => {
+                select.innerHTML += `<option value="${index}">${folder.icon} ${folder.name}</option>`;
+            });
+        }
+
+        function addFolder() {
+            const name = document.getElementById('folderName').value.trim();
+            const icon = document.getElementById('folderIcon').value.trim() || '📁';
+            
+            if (!name) {
+                alert('กรุณากรอกชื่อ Folder');
+                return;
+            }
+            
+            folders.push({
+                id: Date.now(),
+                name: name,
+                icon: icon,
+                links: []
+            });
+            
+            saveData();
+            renderFolders();
+            updateFolderSelect();
+            
+            document.getElementById('folderName').value = '';
+            document.getElementById('folderIcon').value = '';
+            
+            alert('สร้าง Folder เรียบร้อย!');
+        }
+
+        function addLink() {
+            const folderIndex = document.getElementById('linkFolder').value;
+            const title = document.getElementById('linkTitle').value.trim();
+            const url = document.getElementById('linkUrl').value.trim();
+            
+            if (folderIndex === '') {
+                alert('กรุณาเลือก Folder');
+                return;
+            }
+            
+            if (!title || !url) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+            
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                alert('URL ต้องขึ้นต้นด้วย http:// หรือ https://');
+                return;
+            }
+            
+            folders[folderIndex].links.push({ title, url });
+            saveData();
+            renderFolders();
+            
+            document.getElementById('linkTitle').value = '';
+            document.getElementById('linkUrl').value = '';
+            
+            alert('เพิ่มลิงก์เรียบร้อย!');
+        }
+
+        function deleteLink(folderIndex, linkIndex) {
+            if (confirm('ต้องการลบลิงก์นี้หรือไม่?')) {
+                folders[folderIndex].links.splice(linkIndex, 1);
+                saveData();
+                renderFolders();
+            }
+        }
+
+        function deleteFolder(index) {
+            if (confirm('ต้องการลบ Folder นี้และลิงก์ทั้งหมดภายในหรือไม่?')) {
+                folders.splice(index, 1);
+                saveData();
+                renderFolders();
+                updateFolderSelect();
+            }
+        }
+
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+            
+            if (tab === 'folder') {
+                tabs[0].classList.add('active');
+                document.getElementById('folderTab').classList.add('active');
+            } else {
+                tabs[1].classList.add('active');
+                document.getElementById('linkTab').classList.add('active');
+            }
+        }
+
+        function handleToggleClick() {
+            if (isAdmin) {
+                toggleAdmin();
+            } else {
+                showLoginModal();
+            }
+        }
+
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.add('show');
+            document.getElementById('adminPassword').focus();
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('show');
+            document.getElementById('adminPassword').value = '';
+        }
+
+        function login() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                isAdmin = true;
+                closeLoginModal();
+                document.getElementById('adminBadge').classList.remove('hidden');
+                toggleAdmin();
+                renderFolders();
+            } else {
+                alert('รหัสผ่านไม่ถูกต้อง!');
+                document.getElementById('adminPassword').value = '';
+            }
+        }
+
+        function logout() {
+            if (confirm('ต้องการออกจากโหมด Admin หรือไม่?')) {
+                isAdmin = false;
+                document.getElementById('adminBadge').classList.add('hidden');
+                document.getElementById('adminPanel').classList.add('hidden');
+                renderFolders();
+            }
+        }
+
+        function toggleAdmin() {
+            const panel = document.getElementById('adminPanel');
+            panel.classList.toggle('hidden');
+        }
+
+        document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+
+        document.getElementById('linkUrl').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addLink();
+            }
+        });
+
+        loadData();
+    </script>
+</body>
+</html>
