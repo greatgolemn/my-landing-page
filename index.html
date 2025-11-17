@@ -597,7 +597,21 @@
             if (window.firebaseDB) {
                 window.firebaseDB.loadData((data) => {
                     if (data) {
-                        folders = data;
+                        // Convert Firebase object to array if needed
+                        if (typeof data === 'object' && !Array.isArray(data)) {
+                            folders = Object.values(data);
+                        } else if (Array.isArray(data)) {
+                            folders = data;
+                        } else {
+                            folders = [];
+                        }
+                        
+                        // Ensure links is always an array
+                        folders = folders.map(folder => ({
+                            ...folder,
+                            links: Array.isArray(folder.links) ? folder.links : 
+                                   (folder.links ? Object.values(folder.links) : [])
+                        }));
                     } else {
                         // Default folders if no data exists
                         folders = [
