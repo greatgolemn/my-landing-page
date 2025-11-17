@@ -568,24 +568,32 @@
             measurementId: "G-QZMCBFSZDS"
         };
 
+        console.log('Initializing Firebase...');
+        
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
         const foldersRef = ref(database, 'folders');
 
+        console.log('Firebase initialized successfully');
+
         // Make Firebase functions available globally
         window.firebaseDB = {
             saveData: async (data) => {
+                console.log('Saving to Firebase:', data);
                 // Convert array to object with unique keys to preserve structure
                 const dataObject = {};
                 data.forEach((folder, index) => {
                     dataObject[folder.id] = folder;
                 });
                 await set(foldersRef, dataObject);
+                console.log('Data saved to Firebase');
             },
             loadData: (callback) => {
+                console.log('Setting up Firebase listener...');
                 onValue(foldersRef, (snapshot) => {
                     const data = snapshot.val();
+                    console.log('Firebase snapshot received:', data);
                     callback(data);
                 }, (error) => {
                     console.error('Firebase read error:', error);
@@ -593,6 +601,14 @@
                 });
             }
         };
+        
+        console.log('window.firebaseDB set:', window.firebaseDB);
+        
+        // Trigger loadData after Firebase is ready
+        if (window.loadDataWhenReady) {
+            console.log('Calling loadDataWhenReady...');
+            window.loadDataWhenReady();
+        }
     </script>
 
     <script>
@@ -601,9 +617,15 @@
         let folders = [];
 
         function loadData() {
+            console.log('loadData() called');
+            console.log('window.firebaseDB exists:', !!window.firebaseDB);
+            
             // Load from Firebase instead of localStorage
             if (window.firebaseDB) {
+                console.log('Loading from Firebase...');
                 window.firebaseDB.loadData((data) => {
+                    console.log('Firebase data received:', data);
+                    
                     if (data) {
                         // Convert Firebase object to array if needed
                         if (typeof data === 'object' && !Array.isArray(data)) {
@@ -614,13 +636,18 @@
                             folders = [];
                         }
                         
+                        console.log('Folders after conversion:', folders);
+                        
                         // Ensure links is always an array
                         folders = folders.map(folder => ({
                             ...folder,
                             links: Array.isArray(folder.links) ? folder.links : 
                                    (folder.links ? Object.values(folder.links) : [])
                         }));
+                        
+                        console.log('Folders after link conversion:', folders);
                     } else {
+                        console.log('No data in Firebase, using defaults');
                         // Default folders if no data exists
                         folders = [
                             { 
@@ -643,9 +670,12 @@
                         ];
                         saveData(); // Save default data to Firebase
                     }
+                    console.log('Rendering folders:', folders.length, 'folders');
                     renderFolders();
                     updateFolderSelect();
                 });
+            } else {
+                console.error('Firebase not initialized!');
             }
         }
 
@@ -858,7 +888,17 @@
             }
         });
 
-        loadData();
+        // Don't call loadData immediately, wait for Firebase
+        window.loadDataWhenReady = function() {
+            console.log('loadDataWhenReady called');
+            loadData();
+        };
+        
+        // Check if Firebase is already loaded
+        if (window.firebaseDB) {
+            console.log('Firebase already loaded, calling loadData');
+            loadData();
+        }
     </script>
 </body>
 </html>
