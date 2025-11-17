@@ -647,28 +647,9 @@
                         
                         console.log('Folders after link conversion:', folders);
                     } else {
-                        console.log('No data in Firebase, using defaults');
-                        // Default folders if no data exists
-                        folders = [
-                            { 
-                                id: 1, 
-                                name: 'Social Media', 
-                                icon: '📱',
-                                links: [
-                                    { title: 'Facebook', url: 'https://facebook.com' },
-                                    { title: 'Instagram', url: 'https://instagram.com' }
-                                ]
-                            },
-                            { 
-                                id: 2, 
-                                name: 'Work', 
-                                icon: '💼',
-                                links: [
-                                    { title: 'LinkedIn', url: 'https://linkedin.com' }
-                                ]
-                            }
-                        ];
-                        saveData(); // Save default data to Firebase
+                        console.log('No data in Firebase');
+                        // Don't create default data automatically
+                        folders = [];
                     }
                     console.log('Rendering folders:', folders.length, 'folders');
                     renderFolders();
