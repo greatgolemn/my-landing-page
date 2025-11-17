@@ -551,42 +551,87 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, get, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCtBdQC-QBhMVZEZ22IgXLPgT4LvswxVAM",
+            authDomain: "mvp-gpt-chat-app.firebaseapp.com",
+            databaseURL: "https://mvp-gpt-chat-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "mvp-gpt-chat-app",
+            storageBucket: "mvp-gpt-chat-app.firebasestorage.app",
+            messagingSenderId: "163520790893",
+            appId: "1:163520790893:web:fe741241f73cb037275a64",
+            measurementId: "G-QZMCBFSZDS"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const foldersRef = ref(database, 'folders');
+
+        // Make Firebase functions available globally
+        window.firebaseDB = {
+            saveData: async (data) => {
+                await set(foldersRef, data);
+            },
+            loadData: (callback) => {
+                onValue(foldersRef, (snapshot) => {
+                    const data = snapshot.val();
+                    callback(data);
+                });
+            }
+        };
+    </script>
+
     <script>
         const ADMIN_PASSWORD = 'a1234***';
         let isAdmin = false;
         let folders = [];
 
         function loadData() {
-            const savedFolders = localStorage.getItem('myFolders');
-            if (savedFolders) {
-                folders = JSON.parse(savedFolders);
-            } else {
-                folders = [
-                    { 
-                        id: 1, 
-                        name: 'Social Media', 
-                        icon: '📱',
-                        links: [
-                            { title: 'Facebook', url: 'https://facebook.com' },
-                            { title: 'Instagram', url: 'https://instagram.com' }
-                        ]
-                    },
-                    { 
-                        id: 2, 
-                        name: 'Work', 
-                        icon: '💼',
-                        links: [
-                            { title: 'LinkedIn', url: 'https://linkedin.com' }
-                        ]
+            // Load from Firebase instead of localStorage
+            if (window.firebaseDB) {
+                window.firebaseDB.loadData((data) => {
+                    if (data) {
+                        folders = data;
+                    } else {
+                        // Default folders if no data exists
+                        folders = [
+                            { 
+                                id: 1, 
+                                name: 'Social Media', 
+                                icon: '📱',
+                                links: [
+                                    { title: 'Facebook', url: 'https://facebook.com' },
+                                    { title: 'Instagram', url: 'https://instagram.com' }
+                                ]
+                            },
+                            { 
+                                id: 2, 
+                                name: 'Work', 
+                                icon: '💼',
+                                links: [
+                                    { title: 'LinkedIn', url: 'https://linkedin.com' }
+                                ]
+                            }
+                        ];
+                        saveData(); // Save default data to Firebase
                     }
-                ];
+                    renderFolders();
+                    updateFolderSelect();
+                });
             }
-            renderFolders();
-            updateFolderSelect();
         }
 
         function saveData() {
-            localStorage.setItem('myFolders', JSON.stringify(folders));
+            // Save to Firebase instead of localStorage
+            if (window.firebaseDB) {
+                window.firebaseDB.saveData(folders);
+            }
         }
 
         function renderFolders() {

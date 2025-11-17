@@ -1,0 +1,22 @@
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCtBdQC-QBhMVZEZ22IgXLPgT4LvswxVAM",
+  authDomain: "mvp-gpt-chat-app.firebaseapp.com",
+  databaseURL: "https://mvp-gpt-chat-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "mvp-gpt-chat-app",
+  storageBucket: "mvp-gpt-chat-app.firebasestorage.app",
+  messagingSenderId: "163520790893",
+  appId: "1:163520790893:web:fe741241f73cb037275a64",
+  measurementId: "G-QZMCBFSZDS"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
